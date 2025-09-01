@@ -12,22 +12,32 @@
             <tr>
                 <th class="border px-2 py-1">#</th>
                 <th class="border px-2 py-1">Pertanyaan</th>
-                <th class="border px-2 py-1">A</th>
-                <th class="border px-2 py-1">B</th>
-                <th class="border px-2 py-1">C</th>
-                <th class="border px-2 py-1">D</th>
+                <th class="border px-2 py-1">Options</th>
                 <th class="border px-2 py-1">Aksi</th>
             </tr>
         </thead>
         <tbody>
+           
             @foreach($questions as $q)
             <tr>
                 <td class="border px-2 py-1">{{ $loop->iteration }}</td>
                 <td class="border px-2 py-1">{{ $q->text }}</td>
-                <td class="border px-2 py-1">{{ $q->option_a }}<br><span class="text-xs text-gray-500">({{ $q->option_a_sub }})</span></td>
-                <td class="border px-2 py-1">{{ $q->option_b }}<br><span class="text-xs text-gray-500">({{ $q->option_b_sub }})</span></td>
-                <td class="border px-2 py-1">{{ $q->option_c }}<br><span class="text-xs text-gray-500">({{ $q->option_c_sub }})</span></td>
-                <td class="border px-2 py-1">{{ $q->option_d }}<br><span class="text-xs text-gray-500">({{ $q->option_d_sub }})</span></td>
+                <td class="border px-2 py-1">
+                    @php($opts = $q->options ?? [])
+                    @if(count($opts))
+                        <ul class="list-disc list-inside space-y-1">
+                            @foreach($opts as $idx => $opt)
+                                <li>
+                                    <span class="font-semibold">{{ $opt->key ?? chr(65+$idx) }}.</span>
+                                    {{ $opt->text }}
+                                    <span class="text-xs text-gray-500">({{ $opt->subject->name ?? 'Subject' }})</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <span class="text-gray-400 text-sm">Belum ada opsi</span>
+                    @endif
+                </td>
                 <td class="border px-2 py-1">
                     <a href="{{ route('questions.edit', $q) }}" class="text-blue-600">Edit</a> |
                     <form action="{{ route('questions.destroy', $q) }}" method="POST" class="inline">
