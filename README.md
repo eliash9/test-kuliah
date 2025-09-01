@@ -1,66 +1,125 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Tes Minat Mahasiswa – Laravel 11
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web untuk melakukan tes minat mahasiswa, mengelola bank soal, menghitung hasil per Subject (Mata Kuliah), dan menampilkan rekomendasi. Proyek ini menggunakan relasi dinamis antara Question dan Subject melalui entitas QuestionOption, sehingga tidak ada hardcode kategori.
 
-## About Laravel
+## Teknologi yang Digunakan
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Backend: Laravel 11 (PHP ^8.2)
+- Database: MySQL/MariaDB (default `.env.example`), Eloquent ORM & Migrasi
+- Frontend: Blade, Tailwind CSS (via CDN), Alpine.js (CDN), Chart.js (CDN) untuk grafik di halaman web
+- Build tools: Vite (opsional; proyek saat ini memakai CDN untuk UI utama)
+- PDF: barryvdh/laravel-dompdf (chart di PDF dibuat dengan HTML/CSS, bukan JavaScript)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Autentikasi sederhana (login/register), role-based access: Admin & Mahasiswa
+- Admin: CRUD Subject dan Question, dengan opsi jawaban dinamis yang terhubung ke Subject
+- Mahasiswa: mengerjakan tes, melihat hasil beserta grafik & persentase, mengunduh PDF
+- Admin: melihat daftar semua mahasiswa yang memiliki jawaban, membuka detail hasil, dan mengunduh PDF hasil mahasiswa yang konsisten dengan milik user
 
-## Learning Laravel
+## Arsitektur Data (Singkat)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- `subjects`: daftar mata kuliah/tema minat (name, description)
+- `questions`: daftar pertanyaan (text)
+- `question_options`: opsi per-pertanyaan, setiap opsi memiliki `subject_id` target
+  - Kolom: `question_id`, `subject_id`, `text`, `key` (opsional, A/B/C/D)
+- `answers`: jawaban mahasiswa untuk setiap pertanyaan
+  - Kolom relevan: `user_id`, `question_id`, `option_id`
+- `results`: tabel lama (kolom fixed) masih ada untuk kompatibilitas beberapa view admin, namun alur hasil mahasiswa dan PDF kini dihitung dinamis dari `answers`
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Relasi utama:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Question hasMany QuestionOption
+- QuestionOption belongsTo Subject
+- Answer belongsTo QuestionOption dan belongsTo Question
+- Subject hasMany QuestionOption
 
-## Laravel Sponsors
+## Metode Perhitungan Skor
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1) Mahasiswa memilih satu `option` untuk setiap `question`.
+2) Setiap `option` telah ditautkan ke `subject_id` tertentu (melalui `question_options`).
+3) Skor per Subject dihitung dengan cara agregasi jawaban:
+   - Ambil semua `answers` milik user, join ke `question_options.subject`.
+   - Hitung jumlah jawaban per `subject_id`.
+4) Persentase per Subject:
+   - `total = sum(skor_semua_subject)` (minimal 1 untuk hindari pembagian nol)
+   - `persentase_subject = round((skor_subject / total) * 100, 1)`
+5) Rekomendasi:
+   - Subject dengan skor tertinggi dianggap sebagai rekomendasi utama
+   - PDF dan tampilan detail menampilkan daftar rekomendasi (minimal subject teratas)
 
-### Premium Partners
+Catatan: di PDF, chart tidak menggunakan Chart.js (karena DomPDF tidak menjalankan JavaScript). Sebagai gantinya, digunakan bar chart berbasis HTML/CSS (lebar bar proporsional terhadap persentase).
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## Alur Peran
 
-## Contributing
+- Mahasiswa
+  - Mengerjakan tes: `answers.create` → `answers.store`
+  - Rekap hasil dinamis: `results.index`
+  - Detail + PDF dinamis: `results.show`, `results.printPdf`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- Admin
+  - Kelola Soal: `questions` (create/edit dilengkapi pemilihan Subject per opsi)
+  - Kelola Subject: `subjects`
+  - Rekap semua user yang memiliki jawaban: `adminresults.index`
+  - Detail user: `adminresults.show`
+  - PDF user (sama format dengan user): `adminresults.printPdf` (menggunakan view `results.pdf`)
 
-## Code of Conduct
+## Instalasi & Menjalankan
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Prasyarat: PHP ^8.2, Composer, Node.js (opsional jika ingin Vite), MySQL.
 
-## Security Vulnerabilities
+1) Clone & Install
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+composer install
+cp .env.example .env
+php artisan key:generate
+```
 
-## License
+2) Konfigurasi `.env`
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Database (`DB_*`),
+- Session: proyek sudah diset `SESSION_DRIVER=file` untuk dev,
+- (Opsional Dev) Seeder password:
+  - `ADMIN_PASSWORD=` (default fallback: `password`)
+  - `MAHASISWA_PASSWORD=` (default fallback: `password`)
+
+3) Migrasi & Seed
+
+```
+php artisan migrate --seed
+
+# atau untuk instalasi bersih:
+php artisan migrate:fresh --seed
+```
+
+Akun sample:
+
+- Admin: `admin@example.com` / password dari `ADMIN_PASSWORD` atau `password`
+- Mahasiswa: `mahasiswa@example.com` / password dari `MAHASISWA_PASSWORD` atau `password`
+
+4) Menjalankan Aplikasi
+
+```
+php artisan serve
+```
+
+UI saat ini menggunakan CDN Tailwind & Alpine, jadi Vite tidak wajib untuk berjalan.
+
+## Rute Penting
+
+- Halaman depan: `/`
+- Auth: `/login`, `/register`, `/logout`
+- Mahasiswa: `/answers/create`, `/results`, `/results/show`, `/results/print-pdf`
+- Admin: `/questions`, `/subjects`, `/adminresults`, `/adminresults/{user}`, `/adminresults/{user}/print-pdf`
+
+## Pengembangan Lebih Lanjut
+
+- Tambah/kurangi jumlah opsi per pertanyaan (sudah didukung, UI create/edit bisa dibuat lebih dinamis – tombol tambah/hapus baris)
+- Admin index: tampilkan subject teratas dan total jawaban per user
+- Optimasi PDF: tambahkan logo institusi, identitas prodi, dan tanda tangan elektronik
+- Pembersihan skema lama: sudah ada migrasi untuk drop kolom lama di `questions` dan `answers`
+
+## Lisensi
+
+Proyek ini mengikuti lisensi MIT.
