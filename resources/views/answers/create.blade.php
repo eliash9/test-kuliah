@@ -37,7 +37,7 @@
                     <input type="radio" name="answers[{{ $question->id }}]" value="{{ $opt->id }}" class="mr-3" required>
                     <span>
                         {{ $opt->text }}
-                        <span class="text-xs text-gray-500">({{ $opt->subject->name ?? 'Subject' }})</span>
+                        
                     </span>
                 </label>
                 @endforeach
