@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Answer extends Model
+class QuestionOption extends Model
 {
     protected $fillable = [
-        'user_id', 'question_id', 'option_id', 'chosen_option', 'sub',
+        'question_id', 'subject_id', 'text', 'key'
     ];
 
     public function question()
@@ -15,8 +15,9 @@ class Answer extends Model
         return $this->belongsTo(Question::class);
     }
 
-    public function option()
+    public function subject()
     {
-        return $this->belongsTo(\App\Models\QuestionOption::class, 'option_id');
+        return $this->belongsTo(Subject::class);
     }
 }
+

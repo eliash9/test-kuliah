@@ -31,12 +31,13 @@
                 {{ $loop->iteration }}. {{ $question->text }}
             </p>
             <div class="space-y-3">
-                @foreach(['a','b','c','d'] as $opt)
+                @php($opts = $question->options)
+                @foreach($opts as $opt)
                 <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-indigo-50">
-                    <input type="radio" name="answers[{{ $question->id }}]" value="{{ $opt }}" class="mr-3" required>
+                    <input type="radio" name="answers[{{ $question->id }}]" value="{{ $opt->id }}" class="mr-3" required>
                     <span>
-                        {{ $question->{'option_'.$opt} }} 
-                        <span class="text-xs text-gray-500">({{ $question->{'option_'.$opt.'_sub'} }})</span>
+                        {{ $opt->text }}
+                        <span class="text-xs text-gray-500">({{ $opt->subject->name ?? 'Subject' }})</span>
                     </span>
                 </label>
                 @endforeach

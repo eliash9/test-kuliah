@@ -10,7 +10,7 @@
                 <th class="border px-2 py-1">#</th>
                 <th class="border px-2 py-1">Soal</th>
                 <th class="border px-2 py-1">Jawaban</th>
-                <th class="border px-2 py-1">Sub</th>
+                <th class="border px-2 py-1">Subject</th>
             </tr>
         </thead>
         <tbody>
@@ -18,8 +18,8 @@
             <tr>
                 <td class="border px-2 py-1">{{ $loop->iteration }}</td>
                 <td class="border px-2 py-1">{{ $a->question->text ?? '-' }}</td>
-                <td class="border px-2 py-1">{{ $a->chosen_option }}</td>
-                <td class="border px-2 py-1">{{ $a->sub }}</td>
+                <td class="border px-2 py-1">{{ $a->option->text ?? '-' }}</td>
+                <td class="border px-2 py-1">{{ $a->option->subject->name ?? '-' }}</td>
             </tr>
             @endforeach
         </tbody>

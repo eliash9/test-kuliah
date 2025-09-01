@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
             'email' => 'admin@example.com',
         ], [
             'name' => 'Admin User',
-            'password' => Hash::make('password'),
+            'password' => Hash::make(env('ADMIN_PASSWORD', 'password')),
             'role' => 'admin',
         ]);
 
@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
             'email' => 'mahasiswa@example.com',
         ], [
             'name' => 'Mahasiswa User',
-            'password' => Hash::make('password'),
+            'password' => Hash::make(env('MAHASISWA_PASSWORD', 'password')),
             'role' => 'mahasiswa',
         ]);
     }

@@ -16,16 +16,33 @@ class ResultController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
-        // Hanya mahasiswa yang bisa mengakses
         if (!$user->isMahasiswa()) {
             abort(403, 'Akses ditolak.');
         }
-        
-        // Mahasiswa hanya dapat melihat hasil mereka sendiri
-        $results = Result::where('user_id', $user->id)->with('user')->get();
-        
-        return view('results.index', compact('results'));
+
+        // Aggregate dynamic scores per subject from answers
+        $answers = \App\Models\Answer::with('option.subject')
+            ->where('user_id', $user->id)
+            ->get();
+
+        $scores = [];
+        foreach ($answers as $a) {
+            if (!$a->option || !$a->option->subject) continue;
+            $sid = $a->option->subject->id;
+            $sname = $a->option->subject->name;
+            if (!isset($scores[$sid])) {
+                $scores[$sid] = ['subject_id' => $sid, 'subject_name' => $sname, 'score' => 0];
+            }
+            $scores[$sid]['score']++;
+        }
+
+        // Sort by score desc
+        usort($scores, fn($a,$b) => $b['score'] <=> $a['score']);
+
+        return view('results.index', [
+            'scores' => $scores,
+            'user' => $user,
+        ]);
     }
 
     /**
@@ -47,86 +64,86 @@ class ResultController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Result $result)
+    public function show()
     {
         $user = Auth::user();
-        
-        // Hanya mahasiswa yang bisa mengakses
         if (!$user->isMahasiswa()) {
             abort(403, 'Akses ditolak.');
         }
-        
-        // Mahasiswa hanya dapat melihat hasil mereka sendiri
-        if ($result->user_id != $user->id) {
-            abort(403, 'Akses ditolak.');
+
+        $answers = \App\Models\Answer::with('option.subject')
+            ->where('user_id', $user->id)
+            ->get();
+
+        $bySubject = [];
+        foreach ($answers as $a) {
+            if (!$a->option || !$a->option->subject) continue;
+            $sid = $a->option->subject->id;
+            $sname = $a->option->subject->name;
+            if (!isset($bySubject[$sid])) {
+                $bySubject[$sid] = ['label' => $sname, 'score' => 0, 'subject' => $a->option->subject];
+            }
+            $bySubject[$sid]['score']++;
         }
-        
-        // Ambil skor hasil tes
-        $labels = ['Multimedia', 'TKJ', 'RPL', 'Umum'];
-        $scores = [
-            $result->multimedia_score,
-            $result->tkj_score,
-            $result->rpl_score,
-            $result->umum_score,
-        ];
 
-        // Cari sub dengan skor tertinggi
-        $max = max($scores);
-        $maxIndex = array_search($max, $scores);
-        $subMap = ['multimedia', 'Jaringan', 'Rekayasa Perangkat Lunak', 'MBKM'];
-        $topSub = $subMap[$maxIndex];
+        // Top subject
+        $sorted = array_values($bySubject);
+        usort($sorted, fn($a,$b) => $b['score'] <=> $a['score']);
+        $top = $sorted[0] ?? null;
 
-        // Rekomendasi mata kuliah
-        $recommendedSubjects = Subject::where('name', 'like', '%' . $topSub . '%')->get();
+        $recommendedSubjects = [];
+        if ($top) {
+            // Rekomendasi: semua Subject dengan nama mengandung kata kunci top, atau cukup subject top itu sendiri
+            $recommendedSubjects = Subject::where('id', $bySubject[array_key_first($bySubject)]['subject']->id ?? 0)->get();
+        }
+
+        $labels = array_map(fn($r) => $r['label'], $sorted);
+        $scores = array_map(fn($r) => $r['score'], $sorted);
 
         return view('results.show', [
-            'result' => $result,
             'labels' => $labels,
             'scores' => $scores,
             'recommendedSubjects' => $recommendedSubjects,
+            'user' => $user,
         ]);
     }
 
     /**
      * Generate PDF of the result.
      */
-    public function printPdf(Result $result)
+    public function printPdf()
     {
         $user = Auth::user();
-        
-        // Hanya mahasiswa yang bisa mengakses
         if (!$user->isMahasiswa()) {
             abort(403, 'Akses ditolak.');
         }
-        
-        // Mahasiswa hanya dapat melihat hasil mereka sendiri
-        if ($result->user_id != $user->id) {
-            abort(403, 'Akses ditolak.');
+
+        $answers = \App\Models\Answer::with('option.subject')
+            ->where('user_id', $user->id)
+            ->get();
+
+        $bySubject = [];
+        foreach ($answers as $a) {
+            if (!$a->option || !$a->option->subject) continue;
+            $sid = $a->option->subject->id;
+            $sname = $a->option->subject->name;
+            if (!isset($bySubject[$sid])) {
+                $bySubject[$sid] = ['label' => $sname, 'score' => 0, 'subject' => $a->option->subject];
+            }
+            $bySubject[$sid]['score']++;
         }
-        
-        // Ambil skor hasil tes
-        $labels = ['Multimedia', 'TKJ', 'RPL', 'Umum'];
-        $scores = [
-            $result->multimedia_score,
-            $result->tkj_score,
-            $result->rpl_score,
-            $result->umum_score,
-        ];
+        $sorted = array_values($bySubject);
+        usort($sorted, fn($a,$b) => $b['score'] <=> $a['score']);
 
-        // Cari sub dengan skor tertinggi
-        $max = max($scores);
-        $maxIndex = array_search($max, $scores);
-        $subMap = ['multimedia', 'tkj', 'rpl', 'umum'];
-        $topSub = $subMap[$maxIndex];
-
-        // Rekomendasi mata kuliah
-        $recommendedSubjects = Subject::where('name', 'like', '%' . $topSub . '%')->get();
+        $labels = array_map(fn($r) => $r['label'], $sorted);
+        $scores = array_map(fn($r) => $r['score'], $sorted);
+        $recommendedSubjects = !empty($sorted) ? collect([$sorted[0]['subject']]) : collect();
 
         $data = [
-            'result' => $result,
             'labels' => $labels,
             'scores' => $scores,
             'recommendedSubjects' => $recommendedSubjects,
+            'user' => $user,
         ];
 
         $pdf = Pdf::loadView('results.pdf', $data);

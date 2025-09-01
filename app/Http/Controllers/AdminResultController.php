@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Answer;
 use App\Models\Result;
 use App\Models\Subject;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -16,16 +18,15 @@ class AdminResultController extends Controller
     public function index()
     {
         $user = Auth::user();
-        
-        // Hanya admin yang bisa mengakses
         if (!$user->isAdmin()) {
             abort(403, 'Akses ditolak.');
         }
-        
-        // Admin dapat melihat semua hasil
-        $results = Result::with('user')->get();
-        
-        return view('adminresults.index', compact('results'));
+
+        // Ambil semua user yang memiliki jawaban
+        $userIds = Answer::select('user_id')->distinct()->pluck('user_id');
+        $users = User::whereIn('id', $userIds)->get();
+
+        return view('adminresults.index', compact('users'));
     }
 
     /**
@@ -47,83 +48,78 @@ class AdminResultController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Result $result)
+    public function show(User $user)
     {
-        $user = Auth::user();
-        
-        // Hanya admin yang bisa mengakses
-        if (!$user->isAdmin()) {
+        $authUser = Auth::user();
+        if (!$authUser->isAdmin()) {
             abort(403, 'Akses ditolak.');
         }
-        
-        // Admin dapat melihat semua hasil
-        // Tidak perlu pengecekan tambahan untuk admin
-        
-        // Ambil skor hasil tes
-        $labels = ['Multimedia', 'TKJ', 'RPL', 'Umum'];
-        $scores = [
-            $result->multimedia_score,
-            $result->tkj_score,
-            $result->rpl_score,
-            $result->umum_score,
-        ];
+        // Aggregate dynamic scores for the selected user
+        $answers = Answer::with('option.subject')
+            ->where('user_id', $user->id)
+            ->get();
 
-        // Cari sub dengan skor tertinggi
-        $max = max($scores);
-        $maxIndex = array_search($max, $scores);
-        $subMap = ['multimedia', 'Jaringan', 'Rekayasa Perangkat Lunak', 'MBKM'];
-        $topSub = $subMap[$maxIndex];
+        $bySubject = [];
+        foreach ($answers as $a) {
+            if (!$a->option || !$a->option->subject) continue;
+            $sid = $a->option->subject->id;
+            $sname = $a->option->subject->name;
+            if (!isset($bySubject[$sid])) {
+                $bySubject[$sid] = ['label' => $sname, 'score' => 0, 'subject' => $a->option->subject];
+            }
+            $bySubject[$sid]['score']++;
+        }
+        $sorted = array_values($bySubject);
+        usort($sorted, fn($a,$b) => $b['score'] <=> $a['score']);
 
-        // Rekomendasi mata kuliah
-        $recommendedSubjects = Subject::where('name', 'like', '%' . $topSub . '%')->get();
+        $labels = array_map(fn($r) => $r['label'], $sorted);
+        $scores = array_map(fn($r) => $r['score'], $sorted);
+        $recommendedSubjects = !empty($sorted) ? collect([$sorted[0]['subject']]) : collect();
 
-        return view('adminresults.show', [
-            'result' => $result,
-            'labels' => $labels,
-            'scores' => $scores,
-            'recommendedSubjects' => $recommendedSubjects,
-        ]);
+        return view('adminresults.show', compact('user','labels','scores','recommendedSubjects'));
     }
 
     /**
      * Generate PDF of the result for admin.
      */
-    public function printPdf(Result $result)
+    public function printPdf(User $user)
     {
-        $user = Auth::user();
-        
-        // Hanya admin yang bisa mengakses
-        if (!$user->isAdmin()) {
+        $authUser = Auth::user();
+        if (!$authUser->isAdmin()) {
             abort(403, 'Akses ditolak.');
         }
-        
-        // Ambil skor hasil tes
-        $labels = ['Multimedia', 'TKJ', 'RPL', 'Umum'];
-        $scores = [
-            $result->multimedia_score,
-            $result->tkj_score,
-            $result->rpl_score,
-            $result->umum_score,
-        ];
+        // Aggregate dynamic scores for the selected user
+        $answers = Answer::with('option.subject')
+            ->where('user_id', $user->id)
+            ->get();
 
-        // Cari sub dengan skor tertinggi
-        $max = max($scores);
-        $maxIndex = array_search($max, $scores);
-        $subMap = ['multimedia', 'Jaringan', 'Rekayasa Perangkat Lunak', 'MBKM'];
-        $topSub = $subMap[$maxIndex];
+        $bySubject = [];
+        foreach ($answers as $a) {
+            if (!$a->option || !$a->option->subject) continue;
+            $sid = $a->option->subject->id;
+            $sname = $a->option->subject->name;
+            if (!isset($bySubject[$sid])) {
+                $bySubject[$sid] = ['label' => $sname, 'score' => 0, 'subject' => $a->option->subject];
+            }
+            $bySubject[$sid]['score']++;
+        }
+        $sorted = array_values($bySubject);
+        usort($sorted, fn($a,$b) => $b['score'] <=> $a['score']);
 
-        // Rekomendasi mata kuliah
-        $recommendedSubjects = Subject::where('name', 'like', '%' . $topSub . '%')->get();
+        $labels = array_map(fn($r) => $r['label'], $sorted);
+        $scores = array_map(fn($r) => $r['score'], $sorted);
+        $recommendedSubjects = !empty($sorted) ? collect([$sorted[0]['subject']]) : collect();
 
         $data = [
-            'result' => $result,
+            'user' => $user,
             'labels' => $labels,
             'scores' => $scores,
             'recommendedSubjects' => $recommendedSubjects,
         ];
 
-        $pdf = Pdf::loadView('adminresults.pdf', $data);
-        return $pdf->download('hasil_tes_minat_' . $result->user->name . '.pdf');
+        // Gunakan PDF view yang sama dengan user untuk konsistensi
+        $pdf = Pdf::loadView('results.pdf', $data);
+        return $pdf->download('hasil_tes_minat_' . $user->name . '.pdf');
     }
 
     /**

@@ -10,8 +10,8 @@ class Subject extends Model
         'name', 'description'
     ];
 
-    public function questions()
+    public function options()
     {
-        return $this->hasMany(Question::class);
+        return $this->hasMany(\App\Models\QuestionOption::class);
     }
 }

@@ -12,47 +12,75 @@ class QuestionSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\Question::insert([
+        $subjects = \App\Models\Subject::all()->keyBy(function($s){
+            return strtolower($s->name);
+        });
+
+        $findSubject = function(string $key) use ($subjects) {
+            $key = strtolower($key);
+            foreach ($subjects as $name => $s) {
+                if (str_contains($name, $key)) return $s->id;
+            }
+            return $subjects->first()->id ?? null;
+        };
+
+        $data = [
             [
                 'text' => 'Apa minat utama Anda?',
-                'option_a' => 'Desain grafis', 'option_a_sub' => 'multimedia',
-                'option_b' => 'Jaringan komputer', 'option_b_sub' => 'tkj',
-                'option_c' => 'Pemrograman', 'option_c_sub' => 'rpl',
-                'option_d' => 'Kegiatan sosial', 'option_d_sub' => 'umum',
-                'created_at' => now(), 'updated_at' => now(),
+                'options' => [
+                    ['text' => 'Desain grafis', 'subject_key' => 'multimedia'],
+                    ['text' => 'Jaringan komputer', 'subject_key' => 'jaringan'],
+                    ['text' => 'Pemrograman', 'subject_key' => 'rekayasa perangkat lunak'],
+                    ['text' => 'Kegiatan sosial', 'subject_key' => 'mbkm'],
+                ],
             ],
             [
                 'text' => 'Aktivitas favorit di sekolah?',
-                'option_a' => 'Membuat video', 'option_a_sub' => 'multimedia',
-                'option_b' => 'Setting router', 'option_b_sub' => 'tkj',
-                'option_c' => 'Membuat aplikasi', 'option_c_sub' => 'rpl',
-                'option_d' => 'Organisasi', 'option_d_sub' => 'umum',
-                'created_at' => now(), 'updated_at' => now(),
+                'options' => [
+                    ['text' => 'Membuat video', 'subject_key' => 'multimedia'],
+                    ['text' => 'Setting router', 'subject_key' => 'jaringan'],
+                    ['text' => 'Membuat aplikasi', 'subject_key' => 'rekayasa perangkat lunak'],
+                    ['text' => 'Organisasi', 'subject_key' => 'mbkm'],
+                ],
             ],
             [
                 'text' => 'Apa yang paling Anda sukai?',
-                'option_a' => 'Mengedit foto', 'option_a_sub' => 'multimedia',
-                'option_b' => 'Memperbaiki komputer', 'option_b_sub' => 'tkj',
-                'option_c' => 'Menulis kode program', 'option_c_sub' => 'rpl',
-                'option_d' => 'Diskusi kelompok', 'option_d_sub' => 'umum',
-                'created_at' => now(), 'updated_at' => now(),
+                'options' => [
+                    ['text' => 'Mengedit foto', 'subject_key' => 'multimedia'],
+                    ['text' => 'Memperbaiki komputer', 'subject_key' => 'jaringan'],
+                    ['text' => 'Menulis kode program', 'subject_key' => 'rekayasa perangkat lunak'],
+                    ['text' => 'Diskusi kelompok', 'subject_key' => 'mbkm'],
+                ],
             ],
             [
                 'text' => 'Mata pelajaran favorit?',
-                'option_a' => 'Seni rupa', 'option_a_sub' => 'multimedia',
-                'option_b' => 'Komputer', 'option_b_sub' => 'tkj',
-                'option_c' => 'Matematika', 'option_c_sub' => 'rpl',
-                'option_d' => 'Sosiologi', 'option_d_sub' => 'umum',
-                'created_at' => now(), 'updated_at' => now(),
+                'options' => [
+                    ['text' => 'Seni rupa', 'subject_key' => 'multimedia'],
+                    ['text' => 'Komputer', 'subject_key' => 'jaringan'],
+                    ['text' => 'Matematika', 'subject_key' => 'rekayasa perangkat lunak'],
+                    ['text' => 'Sosiologi', 'subject_key' => 'mbkm'],
+                ],
             ],
             [
                 'text' => 'Kegiatan ekstrakurikuler?',
-                'option_a' => 'Multimedia', 'option_a_sub' => 'multimedia',
-                'option_b' => 'Robotika', 'option_b_sub' => 'tkj',
-                'option_c' => 'Olimpiade komputer', 'option_c_sub' => 'rpl',
-                'option_d' => 'Pramuka', 'option_d_sub' => 'umum',
-                'created_at' => now(), 'updated_at' => now(),
+                'options' => [
+                    ['text' => 'Multimedia', 'subject_key' => 'multimedia'],
+                    ['text' => 'Robotika', 'subject_key' => 'jaringan'],
+                    ['text' => 'Olimpiade komputer', 'subject_key' => 'rekayasa perangkat lunak'],
+                    ['text' => 'Pramuka', 'subject_key' => 'mbkm'],
+                ],
             ],
-        ]);
+        ];
+
+        foreach ($data as $qData) {
+            $q = \App\Models\Question::create(['text' => $qData['text']]);
+            foreach ($qData['options'] as $idx => $opt) {
+                $q->options()->create([
+                    'text' => $opt['text'],
+                    'subject_id' => $findSubject($opt['subject_key']),
+                    'key' => chr(65 + $idx),
+                ]);
+            }
+        }
     }
 }

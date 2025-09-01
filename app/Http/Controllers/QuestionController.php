@@ -21,7 +21,8 @@ class QuestionController extends Controller
      */
     public function create()
     {
-    return view('questions.create');
+        $subjects = \App\Models\Subject::all();
+        return view('questions.create', compact('subjects'));
     }
 
     /**
@@ -29,18 +30,23 @@ class QuestionController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'text' => 'required',
-            'option_a' => 'required',
-            'option_a_sub' => 'required',
-            'option_b' => 'required',
-            'option_b_sub' => 'required',
-            'option_c' => 'required',
-            'option_c_sub' => 'required',
-            'option_d' => 'required',
-            'option_d_sub' => 'required',
+        $data = $request->validate([
+            'text' => 'required|string',
+            'options' => 'required|array|min:2',
+            'options.*.text' => 'required|string',
+            'options.*.subject_id' => 'required|exists:subjects,id',
         ]);
-        Question::create($validated);
+
+        $question = Question::create(['text' => $data['text']]);
+        // Create options
+        foreach ($data['options'] as $idx => $opt) {
+            $question->options()->create([
+                'text' => $opt['text'],
+                'subject_id' => $opt['subject_id'],
+                'key' => chr(65 + $idx), // A, B, C, ...
+            ]);
+        }
+
         return redirect()->route('questions.index')->with('success', 'Soal berhasil ditambah');
     }
 
@@ -57,7 +63,9 @@ class QuestionController extends Controller
      */
     public function edit(Question $question)
     {
-    return view('questions.edit', compact('question'));
+        $subjects = \App\Models\Subject::all();
+        $question->load('options');
+        return view('questions.edit', compact('question','subjects'));
     }
 
     /**
@@ -65,18 +73,26 @@ class QuestionController extends Controller
      */
     public function update(Request $request, Question $question)
     {
-        $validated = $request->validate([
-            'text' => 'required',
-            'option_a' => 'required',
-            'option_a_sub' => 'required',
-            'option_b' => 'required',
-            'option_b_sub' => 'required',
-            'option_c' => 'required',
-            'option_c_sub' => 'required',
-            'option_d' => 'required',
-            'option_d_sub' => 'required',
+        $data = $request->validate([
+            'text' => 'required|string',
+            'options' => 'required|array|min:2',
+            'options.*.id' => 'nullable|integer',
+            'options.*.text' => 'required|string',
+            'options.*.subject_id' => 'required|exists:subjects,id',
         ]);
-        $question->update($validated);
+
+        $question->update(['text' => $data['text']]);
+
+        // Sync options: simple approach - delete old and recreate
+        $question->options()->delete();
+        foreach ($data['options'] as $idx => $opt) {
+            $question->options()->create([
+                'text' => $opt['text'],
+                'subject_id' => $opt['subject_id'],
+                'key' => chr(65 + $idx),
+            ]);
+        }
+
         return redirect()->route('questions.index')->with('success', 'Soal berhasil diupdate');
     }
 

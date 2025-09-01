@@ -16,7 +16,7 @@ class AnswerController extends Controller
      */
     public function index()
     {
-        $answers = Answer::with('question')->where('user_id', Auth::id())->get();
+        $answers = Answer::with(['question','option.subject'])->where('user_id', Auth::id())->get();
         return view('answers.index', compact('answers'));
     }
 
@@ -25,7 +25,7 @@ class AnswerController extends Controller
      */
     public function create()
     {
-        $questions = Question::all();
+        $questions = Question::with('options.subject')->get();
         return view('answers.create', compact('questions'));
     }
 
@@ -35,44 +35,28 @@ class AnswerController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        $questions = Question::all();
-        $data = $request->input('answers');
+        $questions = Question::with('options')->get();
+        $data = $request->validate([
+            'answers' => 'required|array',
+        ])['answers'];
 
         // Hapus jawaban lama user (jika ingin 1x tes saja)
         Answer::where('user_id', $user->id)->delete();
 
-        $scores = [
-            'multimedia' => 0,
-            'tkj' => 0,
-            'rpl' => 0,
-            'umum' => 0,
-        ];
-
         foreach ($questions as $q) {
-            $opt = $data[$q->id] ?? null;
-            if (!$opt) continue;
-            $sub = $q['option_' . $opt . '_sub'];
-            $scores[$sub]++;
+            $optionId = $data[$q->id] ?? null;
+            if (!$optionId) continue;
+
+            $option = $q->options->firstWhere('id', (int)$optionId);
+            if (!$option) continue; // skip invalid option
+
             Answer::create([
                 'user_id' => $user->id,
                 'question_id' => $q->id,
-                'chosen_option' => $opt,
-                'sub' => $sub,
+                'option_id' => $option->id,
             ]);
         }
 
-        // Simpan hasil ke tabel results
-        Result::updateOrCreate(
-            ['user_id' => $user->id],
-            [
-                'multimedia_score' => $scores['multimedia'],
-                'tkj_score' => $scores['tkj'],
-                'rpl_score' => $scores['rpl'],
-                'umum_score' => $scores['umum'],
-            ]
-        );
-
-        // Redirect to results page
         return redirect()->route('results.index');
     }
 
