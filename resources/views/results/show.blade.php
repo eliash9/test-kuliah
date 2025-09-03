@@ -6,7 +6,7 @@
         <h1 class="text-3xl font-bold mb-6 text-center text-indigo-700">Hasil Tes Minat Saya</h1>
 
         <div class="mb-8">
-            <canvas id="resultChart" height="160"></canvas>
+            <canvas id="resultChart" height="200"></canvas>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-8">
@@ -61,31 +61,23 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const ctx = document.getElementById('resultChart').getContext('2d');
+    const labels = @json($labels);
+    const dataVals = @json($scores);
+    const total = Math.max(dataVals.reduce((a,b)=>a+b,0),1);
+    const bg = ['#6366f1','#22c55e','#f59e0b','#ef4444','#06b6d4','#a855f7'];
     new Chart(ctx, {
-        type: 'radar',
+        type: 'pie',
         data: {
-            labels: @json($labels),
+            labels: labels.map((l,i)=>`${l} (${Math.round((dataVals[i]/total)*100)}%)`),
             datasets: [{
-                label: 'Skor Minat',
-                data: @json($scores),
-                backgroundColor: 'rgba(99, 102, 241, 0.2)',
-                borderColor: 'rgba(99, 102, 241, 1)',
-                pointBackgroundColor: 'rgba(99, 102, 241, 1)',
-                borderWidth: 2
+                data: dataVals,
+                backgroundColor: labels.map((_,i)=> bg[i%bg.length])
             }]
         },
         options: {
             responsive: true,
-            scales: {
-                r: {
-                    angleLines: { display: true },
-                    suggestedMin: 0,
-                    suggestedMax: Math.max(...@json($scores)) + 1,
-                    ticks: { stepSize: 1 }
-                }
-            }
+            plugins: { legend: { position: 'bottom' } }
         }
     });
-    </script>
+</script>
 @endsection
-

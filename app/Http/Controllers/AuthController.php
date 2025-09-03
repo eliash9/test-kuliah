@@ -23,6 +23,12 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            // Commit pending guest answers if exist
+            $pending = $request->session()->pull('pending_answers');
+            if (is_array($pending)) {
+                \App\Http\Controllers\TestController::commitAnswers(Auth::id(), $pending);
+                return redirect()->route('results.index');
+            }
             return redirect()->intended('/');
         }
 
@@ -53,6 +59,12 @@ class AuthController extends Controller
 
         Auth::login($user);
 
+        // Commit pending guest answers if exist
+        $pending = $request->session()->pull('pending_answers');
+        if (is_array($pending)) {
+            \App\Http\Controllers\TestController::commitAnswers(Auth::id(), $pending);
+            return redirect()->route('results.index');
+        }
         return redirect('/');
     }
 

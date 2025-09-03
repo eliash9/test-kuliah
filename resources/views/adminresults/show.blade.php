@@ -42,7 +42,7 @@
 <script>
     const ctx = document.getElementById('resultChart').getContext('2d');
     new Chart(ctx, {
-        type: 'bar',
+        type: 'pie',
         data: {
             labels: @json($labels),
             datasets: [{
@@ -55,7 +55,20 @@
         },
         options: {
             responsive: true,
-            plugins: { legend: { display: false } }
+            plugins: {
+                legend: { display: true },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            let value = context.parsed;
+                            let total = context.chart._metasets[context.datasetIndex].total;
+                            let percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: ${percentage}%`;
+                        }
+                    }
+                }
+            }
         }
     });
 </script>

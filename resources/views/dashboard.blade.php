@@ -30,7 +30,7 @@
                 📘 Tes Minat
             </h2>
             <p class="mb-4 text-gray-600">Ikuti tes minat untuk mengetahui rekomendasi mata kuliah yang sesuai dengan minat Anda.</p>
-            <a href="{{ route('answers.create') }}" 
+            <a href="{{ route('test.instructions') }}" 
                class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-lg shadow hover:opacity-90 transition">
                Mulai Tes
             </a>

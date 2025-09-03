@@ -12,6 +12,7 @@
                         <th class="px-4 py-3 text-left">#</th>
                         <th class="px-4 py-3 text-left">Subject</th>
                         <th class="px-4 py-3 text-left">Skor</th>
+                        <th class="px-4 py-3 text-left">Prosentase</th>
                     </tr>
                 </thead>
                 <tbody class="text-gray-700">
@@ -20,6 +21,13 @@
                             <td class="px-4 py-3">{{ $loop->iteration }}</td>
                             <td class="px-4 py-3 font-medium">{{ $row['subject_name'] }}</td>
                             <td class="px-4 py-3 font-semibold">{{ $row['score'] }}</td>
+                            <td class="px-4 py-3">
+                                @if(isset($row['max_score']) && $row['max_score'] > 0)
+                                    {{ number_format(($row['score'] / $row['max_score']) * 100, 2) }}%
+                                @else
+                                    -
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

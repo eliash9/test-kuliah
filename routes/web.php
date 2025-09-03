@@ -7,11 +7,17 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\AnswerController;
 use App\Http\Controllers\ResultController;
 use App\Http\Controllers\AdminResultController;
+use App\Http\Controllers\TestController;
 use App\Models\User;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Public test (no auth)
+Route::get('/tes', [TestController::class, 'instructions'])->name('test.instructions');
+Route::get('/tes/kerjakan', [TestController::class, 'start'])->name('test.start');
+Route::post('/tes/selesai', [TestController::class, 'finish'])->name('test.finish');
 
 // Authentication routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
