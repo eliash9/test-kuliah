@@ -21,12 +21,14 @@
                             <td class="px-4 py-3">{{ $loop->iteration }}</td>
                             <td class="px-4 py-3 font-medium">{{ $row['subject_name'] }}</td>
                             <td class="px-4 py-3 font-semibold">{{ $row['score'] }}</td>
-                            <td class="px-4 py-3">
-                                @if(isset($row['max_score']) && $row['max_score'] > 0)
-                                    {{ number_format(($row['score'] / $row['max_score']) * 100, 2) }}%
-                                @else
-                                    -
-                                @endif
+                            <td class="px-4 py-3 align-middle">
+                                @php
+                                    $total = max(array_sum(array_column($scores, 'score')), 1);
+                                    $percent = round(($row['score'] / $total) * 100, 1);
+                                @endphp
+                                <div class="bg-gradient-to-r from-indigo-100 to-indigo-200 px-3 py-2 rounded-lg shadow hover:shadow-lg transition w-fit">
+                                    <p class="text-lg font-bold text-indigo-600">{{ $percent }}%</p>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
