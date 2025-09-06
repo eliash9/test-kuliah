@@ -61,13 +61,13 @@
       </div>
     </div>
   </section>
-<section class="py-16 lg:py-24 bg-white border-t border-slate-100">
+<section id="mata-kuliah" class="py-16 lg:py-24 bg-white border-t border-slate-100">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-2xl text-center mb-8">
             <h2 class="text-3xl font-bold tracking-tight">Pilihan Jurusan Kuliah</h2>
             <p class="mt-3 text-slate-600">Berikut beberapa jurusan yang dapat menjadi rekomendasi akhir dari tes minat & bakat. Setiap jurusan memiliki karakteristik dan peluang karier berbeda.</p>
         </div>
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             @foreach(\App\Models\Subject::all() as $subject)
                 <div class="rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg transition duration-300 transform hover:-translate-y-2 bg-white flex flex-col items-center">
                     <div class="mb-3">

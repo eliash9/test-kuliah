@@ -41,6 +41,7 @@
                 @else
                     <nav class="flex items-center gap-6 text-sm">
                         <a href="#how-it-works" class="hover:text-amber-600 transition">Cara Kerja</a>
+                        <a href="#mata-kuliah" class="hover:text-amber-600 transition">Mata Kuliah</a>
                         <a href="#riasec" class="hover:text-amber-600 transition">Tipe Kepribadian</a>
                         <a href="#faq" class="hover:text-amber-600 transition">FAQ</a>
                     </nav>
