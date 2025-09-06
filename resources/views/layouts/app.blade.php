@@ -15,6 +15,7 @@
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <!-- Logo -->
             <a href="{{ url('/') }}" class="flex items-center gap-2 font-bold text-xl text-blue-700 hover:text-blue-800">
+                 <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500 text-white font-bold">E</span>
                 <span class="font-semibold tracking-tight">EduBrand</span>
             </a>
 

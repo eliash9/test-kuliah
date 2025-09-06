@@ -21,7 +21,7 @@
       <div class="relative">
         <div class="absolute -top-8 -right-8 h-64 w-64 rounded-full bg-amber-100 blur-3xl opacity-70"></div>
         <div class="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-slate-200 shadow-sm">
-          <div class="h-full w-full bg-[conic-gradient(at_30%_20%,#fde68a_0deg,#fff_120deg,#fef3c7_240deg,#fff_360deg)]"></div>
+          <img src="https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=800&q=80" alt="Tes Minat & Bakat" class="h-full w-full object-cover" />
         </div>
         <div class="mt-4 grid grid-cols-3 gap-3 text-center text-xs text-slate-600">
           <div class="rounded-xl border border-slate-200 p-3">± 10–15 menit</div>
@@ -61,6 +61,28 @@
       </div>
     </div>
   </section>
+<section class="py-16 lg:py-24 bg-white border-t border-slate-100">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center mb-8">
+            <h2 class="text-3xl font-bold tracking-tight">Pilihan Jurusan Kuliah</h2>
+            <p class="mt-3 text-slate-600">Berikut beberapa jurusan yang dapat menjadi rekomendasi akhir dari tes minat & bakat. Setiap jurusan memiliki karakteristik dan peluang karier berbeda.</p>
+        </div>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            @foreach(\App\Models\Subject::all() as $subject)
+                <div class="rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg transition duration-300 transform hover:-translate-y-2 bg-white flex flex-col items-center">
+                    <div class="mb-3">
+                        <svg class="h-10 w-10 text-amber-500 animate-bounce" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="#fde68a"/>
+                            <path d="M8 12h8M12 8v8" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">{{ $subject->name }}</h3>
+                    <p class="text-sm text-slate-600">{{ $subject->description }}</p>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
 
   <!-- RIASEC -->
   <section id="riasec" class="py-16 lg:py-24">
