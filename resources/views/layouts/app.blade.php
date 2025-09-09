@@ -15,6 +15,7 @@
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <!-- Logo -->
             <a href="{{ url('/') }}" class="flex items-center gap-2 font-bold text-xl text-blue-700 hover:text-blue-800">
+                 <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500 text-white font-bold">E</span>
                 <span class="font-semibold tracking-tight">EduBrand</span>
             </a>
 
@@ -39,8 +40,9 @@
                     </form>
                 @else
                     <nav class="flex items-center gap-6 text-sm">
-                        <a href="#how-it-works" class="hover:text-amber-600 transition">Cara Kerja</a>
-                        <a href="#riasec" class="hover:text-amber-600 transition">Tipe Kepribadian</a>
+                        <a href="#how-it-works" class="hover:text-amber-600 transition">Cara Kerja</a>                        
+                        <a href="#riasec" class="hover:text-amber-600 transition">Mengapa Tes Minat & Bakat?</a>
+                        <a href="#mata-kuliah" class="hover:text-amber-600 transition">Mata Kuliah</a>
                         <a href="#faq" class="hover:text-amber-600 transition">FAQ</a>
                     </nav>
                     <div class="flex items-center gap-3">

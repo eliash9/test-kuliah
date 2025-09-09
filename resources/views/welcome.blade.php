@@ -21,11 +21,11 @@
       <div class="relative">
         <div class="absolute -top-8 -right-8 h-64 w-64 rounded-full bg-amber-100 blur-3xl opacity-70"></div>
         <div class="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-slate-200 shadow-sm">
-          <div class="h-full w-full bg-[conic-gradient(at_30%_20%,#fde68a_0deg,#fff_120deg,#fef3c7_240deg,#fff_360deg)]"></div>
+          <img src="hero.png" alt="Tes Minat & Bakat" class="h-full w-full object-cover" />
         </div>
         <div class="mt-4 grid grid-cols-3 gap-3 text-center text-xs text-slate-600">
           <div class="rounded-xl border border-slate-200 p-3">± 10–15 menit</div>
-          <div class="rounded-xl border border-slate-200 p-3">Berbasis RIASEC</div>
+          <div class="rounded-xl border border-slate-200 p-3">Berbasis Soal</div>
           <div class="rounded-xl border border-slate-200 p-3">Hasil instan</div>
         </div>
       </div>
@@ -61,61 +61,76 @@
       </div>
     </div>
   </section>
-
-  <!-- RIASEC -->
-  <section id="riasec" class="py-16 lg:py-24">
+  
+<!-- RIASEC -->
+<section id="riasec" class="py-16 lg:py-24">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl text-center">
-        <h2 class="text-3xl font-bold tracking-tight">Tipe Kepribadian RIASEC</h2>
-        <p class="mt-3 text-slate-600">Enam tipe berikut sering dipakai untuk memahami kecenderungan minat & cara kerja seseorang.</p>
-      </div>
-      <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <!-- Tile -->
-        <article class="rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
-          <div class="flex items-center gap-3">
-            <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 font-bold">R</span>
-            <h3 class="text-lg font-semibold">Realistic</h3>
-          </div>
-          <p class="mt-2 text-sm text-slate-600">Menyukai aktivitas praktis, teknis, dan penggunaan alat. Cenderung hands-on.</p>
-        </article>
-        <article class="rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
-          <div class="flex items-center gap-3">
-            <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 font-bold">I</span>
-            <h3 class="text-lg font-semibold">Investigative</h3>
-          </div>
-          <p class="mt-2 text-sm text-slate-600">Tertarik analisis, riset, pemecahan masalah, dan berpikir kritis.</p>
-        </article>
-        <article class="rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
-          <div class="flex items-center gap-3">
-            <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 font-bold">A</span>
-            <h3 class="text-lg font-semibold">Artistic</h3>
-          </div>
-          <p class="mt-2 text-sm text-slate-600">Menghargai kreativitas, ekspresi diri, dan lingkungan kerja yang fleksibel.</p>
-        </article>
-        <article class="rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
-          <div class="flex items-center gap-3">
-            <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 font-bold">S</span>
-            <h3 class="text-lg font-semibold">Social</h3>
-          </div>
-          <p class="mt-2 text-sm text-slate-600">Senang membantu orang lain, mengajar, membimbing, atau memberi layanan.</p>
-        </article>
-        <article class="rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
-          <div class="flex items-center gap-3">
-            <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 font-bold">E</span>
-            <h3 class="text-lg font-semibold">Enterprising</h3>
-          </div>
-          <p class="mt-2 text-sm text-slate-600">Gesit memimpin dan memengaruhi; enjoy bernegosiasi dan mengambil keputusan.</p>
-        </article>
-        <article class="rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
-          <div class="flex items-center gap-3">
-            <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 font-bold">C</span>
-            <h3 class="text-lg font-semibold">Conventional</h3>
-          </div>
-          <p class="mt-2 text-sm text-slate-600">Terstruktur, rapi, teliti; nyaman dengan sistem dan prosedur yang jelas.</p>
-        </article>
-      </div>
+        <div class="mx-auto max-w-2xl text-center mb-8">
+            <h2 class="text-3xl font-bold tracking-tight">Mengapa Tes Minat & Bakat?</h2>
+        </div>
+        <div class="grid gap-6 sm:grid-cols-1 lg:grid-cols-3">
+            <!-- Hindari Salah Jurusan -->
+            <div class="rounded-2xl border border-slate-200 p-6 shadow-sm bg-white flex flex-col items-center">
+                <div class="mb-3">
+                    <!-- Icon: Warning/Exclamation -->
+                    <svg class="h-10 w-10 text-amber-500" fill="none" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" fill="#fde68a"/>
+                        <path d="M12 8v4m0 4h.01" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">Hindari Salah Jurusan</h3>
+                <p class="text-sm text-slate-600 text-center">Banyak siswa salah jurusan karena tidak tahu potensi diri sejak awal.</p>
+            </div>
+            <!-- Kenali Potensi Diri -->
+            <div class="rounded-2xl border border-slate-200 p-6 shadow-sm bg-white flex flex-col items-center">
+                <div class="mb-3">
+                    <!-- Icon: User/Person -->
+                    <svg class="h-10 w-10 text-amber-500" fill="none" viewBox="0 0 24 24">
+                        <circle cx="12" cy="8" r="4" fill="#fde68a"/>
+                        <path d="M4 20c0-4 8-4 8-4s8 0 8 4" stroke="#d97706" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">Kenali Potensi Diri</h3>
+                <p class="text-sm text-slate-600 text-center">Dengan tes minat bakat, Anda tidak perlu bingung lagi menentukan pilihan.</p>
+            </div>
+            <!-- Terbukti Membantu -->
+            <div class="rounded-2xl border border-slate-200 p-6 shadow-sm bg-white flex flex-col items-center">
+                <div class="mb-3">
+                    <!-- Icon: Check/Success -->
+                    <svg class="h-10 w-10 text-amber-500" fill="none" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" fill="#fde68a"/>
+                        <path d="M8 13l3 3 5-5" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">Terbukti Membantu</h3>
+                <p class="text-sm text-slate-600 text-center">Ribuan siswa sudah terbantu menemukan jalur pendidikan dan karier terbaik.</p>
+            </div>
+        </div>
     </div>
-  </section>
+</section>
+<section id="mata-kuliah" class="py-16 lg:py-24 bg-white border-t border-slate-100">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center mb-8">
+            <h2 class="text-3xl font-bold tracking-tight">Pilihan Jurusan Kuliah</h2>
+            <p class="mt-3 text-slate-600">Berikut beberapa jurusan yang dapat menjadi rekomendasi akhir dari tes minat & bakat. Setiap jurusan memiliki karakteristik dan peluang karier berbeda.</p>
+        </div>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            @foreach(\App\Models\Subject::all() as $subject)
+                <div class="rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg transition duration-300 transform hover:-translate-y-2 bg-white flex flex-col items-center">
+                    <div class="mb-3">
+                        <svg class="h-10 w-10 text-amber-500 animate-bounce" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="#fde68a"/>
+                            <path d="M8 12h8M12 8v8" stroke="#d97706" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">{{ $subject->name }}</h3>
+                    <p class="text-sm text-slate-600">{{ $subject->description }}</p>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
 
   <!-- FAQ -->
   <section id="faq" class="py-16 lg:py-24 border-t border-slate-100">
