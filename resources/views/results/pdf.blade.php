@@ -100,50 +100,85 @@
         </table>
     </div>
 
-    @php($total = max(array_sum($scores ?? []), 1))
-    <div class="info-section">
-        <h3>Hasil Tes Minat</h3>
-        <table class="info-table">
-            <thead>
-                <tr>
-                    <th>Kategori</th>
-                    <th>Skor</th>
-                    <th>Persentase</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($labels as $i => $label)
-                @php($val = (int)($scores[$i] ?? 0))
-                @php($pct = round(($val / $total) * 100, 1))
-                <tr>
-                    <td>{{ $label }}</td>
-                    <td>{{ $val }}</td>
-                    <td>{{ $pct }}%</td>
-                </tr>
-                @endforeach
-            </tbody>
+    
+    <div class="chart-section">
+        <h3>Skor (Persentase)</h3>
+        @php
+            $colors = ['#6366f1','#22c55e','#f59e0b','#ef4444','#06b6d4','#a855f7'];
+        @endphp
+        <table style="width:100%; border-collapse: collapse;">
+            <tr>
+                <td style="width: 260px; vertical-align: top; padding: 8px 0; text-align:center;">
+                    @if(!empty($chartBase64))
+                        <img alt="Pie chart" src="data:image/png;base64,{{ $chartBase64 }}" style="width:240px; height:240px;" />
+                    @else
+                        @php
+                            // Fallback to SVG if GD is unavailable
+                            $r = 80; $cx = 110; $cy = 110; $sw = 28;
+                            $circ = 2 * pi() * $r; $acc = 0.0;
+                            $fmt = function($n){ return number_format($n, 3, '.', ''); };
+                        @endphp
+                        <svg width="220" height="220" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="rotate(-90 110 110)">
+                                <circle cx="{{ $cx }}" cy="{{ $cy }}" r="{{ $r }}" fill="none" stroke="#e5e7eb" stroke-width="{{ $sw }}" />
+                                @foreach($labels as $i => $label)
+                                    @php
+                                        $val = (float)($scores[$i] ?? 0);
+                                        $pct = $total > 0 ? ($val / $total) : 0;
+                                        $seg = $pct * $circ;
+                                        $dasharray = $fmt($seg) . ' ' . $fmt($circ - $seg);
+                                        $dashoffset = $fmt(-$acc);
+                                        $color = $colors[$i % count($colors)];
+                                        $acc += $seg;
+                                    @endphp
+                                    @if($seg > 0)
+                                    <circle cx="{{ $cx }}" cy="{{ $cy }}" r="{{ $r }}" fill="none"
+                                            stroke="{{ $color }}" stroke-width="{{ $sw }}"
+                                            stroke-dasharray="{{ $dasharray }}"
+                                            stroke-dashoffset="{{ $dashoffset }}" />
+                                    @endif
+                                @endforeach
+                            </g>
+                            @php
+                                $centerLabel = $topLabel ?? '';
+                                $centerPercent = isset($topPercent) ? ($topPercent . '%') : '';
+                            @endphp
+                            <g>
+                                <text x="110" y="108" text-anchor="middle" fill="#374151" font-size="12" font-family="Arial, sans-serif">{{ $centerLabel }}</text>
+                                <text x="110" y="126" text-anchor="middle" fill="#374151" font-size="16" font-weight="bold" font-family="Arial, sans-serif">{{ $centerPercent }}</text>
+                            </g>
+                        </svg>
+                    @endif
+                </td>
+                <td style="vertical-align: top; padding-left: 12px;">
+                    <div>
+                        @foreach($labels as $index => $label)
+                            @php
+                                $total = max(array_sum($scores), 1);
+                                $percent = round(($scores[$index] / $total) * 100, 1);
+                                $color = $colors[$index % count($colors)];
+                            @endphp
+                            <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                                <div style="width: 16px; height: 16px; border-radius: 50%; background: {{ $color }}; margin-right: 10px;"></div>
+                                <div style="flex: 1;">
+                                    <span style="font-weight: bold; color: #333;">{{ $label }}</span>
+                                </div>
+                                <div style="width: 70px; text-align: right; font-size: 13px; color: #4f46e5; font-weight: bold;">
+                                    {{ $percent }}%
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    
+                </td>
+            </tr>
         </table>
     </div>
 
-    <div class="chart-section">
-        <h3>Chart Skor (Persentase)</h3>
-        @php($barWidth = 300)
-        <table style="width:100%; border-collapse: collapse; margin-top: 6px;">
-            @foreach($labels as $i => $label)
-                @php($val = (int)($scores[$i] ?? 0))
-                @php($pct = round(($val / $total) * 100))
-                @php($px = round(($pct/100) * $barWidth))
-                <tr>
-                    <td style="padding:6px 6px 6px 0; width: 35%; font-weight: bold;">{{ $label }}</td>
-                    <td style="padding:6px 8px; width: {{ $barWidth+12 }}px;">
-                        <div style="width: {{ $barWidth }}px; height: 12px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 3px;">
-                            <div style="width: {{ $px }}px; height: 100%; background: #4f46e5;"></div>
-                        </div>
-                    </td>
-                    <td style="padding:6px 0; text-align: right; width: 10%;">{{ $pct }}%</td>
-                </tr>
-            @endforeach
-        </table>
+    <div class="info-section" style="margin-top: 8px;">
+        <h3>Motivasi Untukmu</h3>
+        @php $motLabel = $topLabel ?? null; @endphp
+        <p style="margin: 0;">{{ $motLabel ? "Fokus minatmu paling kuat pada: $motLabel. Terus perdalam dan eksplorasi bidang tersebut!" : 'Teruslah belajar dan temukan passionmu!' }}</p>
     </div>
 
     <div class="info-section">
